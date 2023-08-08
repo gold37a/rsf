@@ -8,4 +8,5 @@ edition = "2021"
 [dependencies]
 bdk = "0.28.1"
 bip39 = "2.0.0"
+rand = '0.8.5'
 bitcoin = { version = "0.30.1", features = ["serde"] }

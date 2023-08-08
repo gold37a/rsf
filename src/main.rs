@@ -1,9 +1,24 @@
-use rsf::get_balance_from_phrase;
+use rsf::{create_mnemonic_phrase, get_balance_from_phrase};
 use std::fs::OpenOptions;
 use std::io::Write;
 
 fn main() {
-    let phrases: Vec<String> = Vec::new();
+    let mut phrases: Vec<String> = Vec::new();
+
+    match std::env::args().nth(1) {
+        Some(times) => match &times.parse::<u64>() {
+            Ok(t) => {
+                for _ in 1..=*t {
+                    match create_mnemonic_phrase() {
+                        Ok(phrase) => phrases.push(phrase),
+                        Err(e) => panic!("{}", e.to_string()),
+                    }
+                }
+            }
+            Err(e) => panic!("{}", e.to_string()),
+        },
+        None => panic!("Please provide the number of phrases to generate"),
+    }
 
     let mut greater_than_10000_file = OpenOptions::new()
         .append(true)

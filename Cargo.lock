@@ -491,6 +491,7 @@ dependencies = [
  "bdk",
  "bip39",
  "bitcoin 0.30.1",
+ "rand",
 ]
 
 [[package]]
