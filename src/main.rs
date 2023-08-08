@@ -5,6 +5,13 @@ use std::fs::OpenOptions;
 fn main() {
     // let mut phrases: Vec<String> = Vec::new();
 
+    let mut all_file = OpenOptions::new()
+        .write(true)
+        .truncate(true)
+        .create(true)
+        .open("results/all.txt")
+        .expect(&format!("Could not open file `{}`", "all"));
+
     let mut above_10000_file = OpenOptions::new()
         .write(true)
         .truncate(true)
@@ -26,6 +33,13 @@ fn main() {
         .open("results/above_100.txt")
         .expect(&format!("Could not open file `{}`", "above_100"));
 
+    let mut above_0_file = OpenOptions::new()
+        .write(true)
+        .truncate(true)
+        .create(true)
+        .open("results/above_0.txt")
+        .expect(&format!("Could not open file `{}`", "above_0"));
+
     let mut below_100_file = OpenOptions::new()
         .write(true)
         .truncate(true)
@@ -39,9 +53,11 @@ fn main() {
                 for _ in 1..=*t {
                     sort_balance(
                         create_wallet_get_balance().unwrap(),
+                        &mut all_file,
                         &mut above_10000_file,
                         &mut above_1000_file,
                         &mut above_100_file,
+                        &mut above_0_file,
                         &mut below_100_file,
                     )
                 }
