@@ -9,43 +9,50 @@ fn main() {
         .write(true)
         .truncate(true)
         .create(true)
-        .open("results/all.txt")
+        .open("balance_results/all.txt")
         .expect(&format!("Could not open file `{}`", "all"));
 
     let mut above_10000_file = OpenOptions::new()
         .write(true)
         .truncate(true)
         .create(true)
-        .open("results/above_10000.txt")
-        .expect(&format!("Could not open file `{}`", "above_10000"));
+        .open("balance_results/above_10000.txt")
+        .expect(&format!("Could not open file `{}`", "above_10000.txt"));
 
     let mut above_1000_file = OpenOptions::new()
         .write(true)
         .truncate(true)
         .create(true)
-        .open("results/above_1000.txt")
-        .expect(&format!("Could not open file `{}`", "above_1000"));
+        .open("balance_results/above_1000.txt")
+        .expect(&format!("Could not open file `{}`", "above_1000.txt"));
 
     let mut above_100_file = OpenOptions::new()
         .write(true)
         .truncate(true)
         .create(true)
-        .open("results/above_100.txt")
-        .expect(&format!("Could not open file `{}`", "above_100"));
+        .open("balance_results/above_100.txt")
+        .expect(&format!("Could not open file `{}`", "above_100.txt"));
 
-    let mut above_0_file = OpenOptions::new()
+    let mut above_0_to_100_file = OpenOptions::new()
         .write(true)
         .truncate(true)
         .create(true)
-        .open("results/above_0.txt")
-        .expect(&format!("Could not open file `{}`", "above_0"));
+        .open("balance_results/above_0_to_100.txt")
+        .expect(&format!("Could not open file `{}`", "above_0_to_100.txt"));
 
-    let mut below_100_file = OpenOptions::new()
+    let mut equals_0_file = OpenOptions::new()
         .write(true)
         .truncate(true)
         .create(true)
-        .open("results/below_100.txt")
-        .expect(&format!("Could not open file `{}`", "below_100"));
+        .open("balance_results/equals_0.txt")
+        .expect(&format!("Could not open file `{}`", "equals_0.txt"));
+
+    let mut below_0_file = OpenOptions::new()
+        .write(true)
+        .truncate(true)
+        .create(true)
+        .open("balance_results/below_0.txt")
+        .expect(&format!("Could not open file `{}`", "below_0.txt"));
 
     match std::env::args().nth(1) {
         Some(times) => match &times.parse::<u64>() {
@@ -57,8 +64,9 @@ fn main() {
                         &mut above_10000_file,
                         &mut above_1000_file,
                         &mut above_100_file,
-                        &mut above_0_file,
-                        &mut below_100_file,
+                        &mut above_0_to_100_file,
+                        &mut equals_0_file,
+                        &mut below_0_file,
                     )
                 }
             }

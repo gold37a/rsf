@@ -112,8 +112,9 @@ pub fn sort_balance(
     above_10000_file: &mut File,
     above_1000_file: &mut File,
     above_100_file: &mut File,
-    above_0_file: &mut File,
-    below_100_file: &mut File,
+    above_0_to_100_file: &mut File,
+    equals_0_file: &mut File,
+    below_0_file: &mut File,
 ) {
     writeln!(
         all_file,
@@ -121,7 +122,7 @@ pub fn sort_balance(
         account.0, account.1
     )
     .expect(&format!(
-        "Encountered error writing `{} : {}` to all_file",
+        "Encountered error writing `{} : {}` to all_file.txt",
         account.0, account.1
     ));
     match account {
@@ -132,7 +133,7 @@ pub fn sort_balance(
                 mnemonic, balance
             )
             .expect(&format!(
-                "Encountered error writing `{} : {}` to above_10000_file",
+                "Encountered error writing `{} : {}` to above_10000_file.txt",
                 mnemonic, balance
             ));
         }
@@ -143,7 +144,7 @@ pub fn sort_balance(
                 mnemonic, balance
             )
             .expect(&format!(
-                "Encountered error writing `{} : {}` to above_1000_file",
+                "Encountered error writing `{} : {}` to above_1000_file.txt",
                 mnemonic, balance
             ));
         }
@@ -154,31 +155,43 @@ pub fn sort_balance(
                 mnemonic, balance
             )
             .expect(&format!(
-                "Encountered error writing `{} : {}` to above_100_file",
+                "Encountered error writing `{} : {}` to above_100_file.txt",
                 mnemonic, balance
             ));
         }
-        (mnemonic, balance) if balance > 0 => {
+        (mnemonic, balance) if balance > 0 && balance <= 100 => {
             writeln!(
-                above_0_file,
+                above_0_to_100_file,
                 "wallet mnemonic: {}\nbalance: {}\n\n",
                 mnemonic, balance
             )
             .expect(&format!(
-                "Encountered error writing `{} : {}` to above_0_file",
+                "Encountered error writing `{} : {}` to above_0_to_100_file.txt",
+                mnemonic, balance
+            ));
+        }
+        (mnemonic, balance) if balance == 0 => {
+            writeln!(
+                equals_0_file,
+                "wallet mnemonic: {}\nbalance: {}\n\n",
+                mnemonic, balance
+            )
+            .expect(&format!(
+                "Encountered error writing `{} : {}` to equals_0_file.txt",
                 mnemonic, balance
             ));
         }
         (mnemonic, balance) => {
             writeln!(
-                below_100_file,
+                below_0_file,
                 "wallet mnemonic: {}\nbalance: {}\n\n",
                 mnemonic, balance
             )
             .expect(&format!(
-                "Encountered error writing `{} : {}` to below_100_file",
+                "Encountered error writing `{} : {}` to below_0_file.txt",
                 mnemonic, balance
             ));
         }
+
     }
 }
