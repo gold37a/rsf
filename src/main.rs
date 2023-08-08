@@ -1,34 +1,60 @@
-use rsf::{get_balance_from_private_key, get_private_key_from_phrase};
+use rsf::get_balance_from_phrase;
 use std::fs::OpenOptions;
+use std::io::Write;
 
 fn main() {
     let phrases: Vec<String> = Vec::new();
 
-    let mut gt_than_10000_file = fs::OpenOptions::new()
-    .append(true)
-    .create(true)
-    .open(file_name)
-    .expect("Could not open file `{}`", gt_than_10000_file);
+    let mut greater_than_10000_file = OpenOptions::new()
+        .append(true)
+        .create(true)
+        .open("greater_than_10000")
+        .expect(&format!("Could not open file `{}`", "greater_than_10000"));
 
-    let mut gt_than_1000_file = fs::OpenOptions::new()
-    .append(true)
-    .create(true)
-    .open(file_name)
-    .expect("Could not open file `{}`", gt_than_1000_file);
+    let mut greater_than_1000_file = OpenOptions::new()
+        .append(true)
+        .create(true)
+        .open("greater_than_1000")
+        .expect(&format!("Could not open file `{}`", "greater_than_1000"));
 
-    let mut gt_than_100_file = fs::OpenOptions::new()
-    .append(true)
-    .create(true)
-    .open(file_name)
-    .expect("Could not open file `{}`", gt_than_100_file);
+    let mut greater_than_100_file = OpenOptions::new()
+        .append(true)
+        .create(true)
+        .open("greater_than_100")
+        .expect(&format!("Could not open file `{}`", "greater_than_100"));
 
     for phrase in phrases {
-        let amount = get_balance_from_private_key(get_private_key_from_phrase(phrase));
-        match x {
-            x if x > 10000 => writeln!(gt_10000, "{} : {}", phrase, amount),
-            x if x > 1000 => writeln!(gt_1000, "{} : {}", phrase, amount),
-            x if x > 100 => writeln!(gt_1000, "{} : {}", phrase, amount),
-            _ => {},
+        match get_balance_from_phrase(&phrase) {
+            Ok(balance) => match balance {
+                balance if balance > 10000 => {
+                    writeln!(&mut greater_than_10000_file, "{} : {}", phrase, balance).expect(
+                        &format!(
+                            "Encountered error writing `{} : {}` to greater_than_10000_file",
+                            phrase, balance
+                        ),
+                    );
+                }
+                balance if balance > 1000 => {
+                    writeln!(&mut greater_than_1000_file, "{} : {}", phrase, balance).expect(
+                        &format!(
+                            "Encountered error writing `{} : {}` to greater_than_1000_file",
+                            phrase, balance
+                        ),
+                    );
+                }
+                balance if balance > 100 => {
+                    writeln!(&mut greater_than_100_file, "{} : {}", phrase, balance).expect(
+                        &format!(
+                            "Encountered error writing `{} : {}` to greater_than_100_file",
+                            phrase, balance
+                        ),
+                    );
+                }
+                _ => {}
+            },
+            Err(e) => {
+                panic!("{}", e.to_string())
+            }
         }
     }
 }

@@ -1,44 +1,24 @@
-use bitcoin::{Address, Client, GetBlockTemplateModes, Network, PrivateKey};
-use bip39::{Language, Mnemonic, MnemonicType, Seed};
-use bitcoin::util::bip32::{ChildNumber, ExtendedPrivKey, ExtendedPubKey};
-use bitcoin::network::constants::Network;
+use bdk::{bitcoin::Network, database::MemoryDatabase, Wallet};
+use bip39::{Language, Mnemonic};
+use bitcoin::bip32::ExtendedPrivKey;
+use bitcoin::network::constants::Network as BitcoinNetwork;
 
-pub fn get_private_key_from_phrase(phrase: String) {
+pub fn get_balance_from_phrase(phrase: &str) -> Result<u64, String> {
     // Validate the phrase
-    let mnemonic = Mnemonic::from_phrase(phrase, Language::English).unwrap();
-    assert_eq!(phrase, mnemonic.phrase());
-
-    // Convert the phrase to a seed integer
-    let seed = Seed::new(&mnemonic, "");
-
-    // Derive the master private key from the seed
-    let master = ExtendedPrivKey::new_master(Network::Bitcoin, seed.as_bytes()).unwrap();
-
-    // Derive the first account private key from the master key
-    return master
-        .ckd_priv(
-            &*bitcoin::SECP256K1,
-            ChildNumber::from_hardened_idx(0).unwrap(),
-        )
-        .unwrap();
-}
-
-pub fn get_balance_from_private_key(key: String) {
-    // Create a private key from a hex string
-    let privkey =
-        PrivateKey::from_wif("L1r2pKfupJBzXn2S4NXgHCwfBtQYv2MhJZK4gmB7L59D1oe1mTav").unwrap();
-
-    // Generate a compressed P2PKH address from the private key
-    let address = Address::p2pkh(&privkey.public_key(), Network::Bitcoin);
-
-    // Print the address
-    println!("Address: {}", address);
-
-    // Create a client to connect to a Bitcoin node
-    let client = Client::new("http://user:pass@localhost:8332").unwrap();
-
-    // Get the balance of the address in satoshis
-    let balance = client.get_address_balance(&address).unwrap();
-
-    return balance.confirmed
+    match Mnemonic::parse_in(Language::English, phrase) {
+        Ok(m) => {
+            // Derive the master private key from the seed
+            match ExtendedPrivKey::new_master(BitcoinNetwork::Bitcoin, &m.to_seed("")) {
+                Ok(epk) =>  match Wallet::new(&format!("wpkh({}/84'/0'/0'/0/*)", epk), None, Network::Bitcoin, MemoryDatabase::default(), ) {
+        Ok(w) => match w.get_balance() {
+            Ok(balance) => Ok(balance.confirmed),
+            Err(e) => Err(format!("Encountered an error while trying to get balance of wallet with mnemonic phrase: {}. Error: {}", phrase, e.to_string()))
+        }
+        Err(e) => Err(format!("Encountered an error while trying to get wallet with mnemonic phrase: {}. Error: {}", phrase, e.to_string()))
+    }
+                Err(e) => Err(format!("Encountered an error trying to get the master key for the following phrase: {}. Error: {}", phrase, e.to_string()))
+            }
+        },
+        Err(e) => Err(format!("Encountered an error trying to parse the following phrase (while trying to get its master key): {}. Error: {}", phrase, e.to_string()))
+    }
 }
